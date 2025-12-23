@@ -1,0 +1,14 @@
+fastapi
+pydantic
+pyjwt
+pwdlib[argon2]
+uvicorn
+sqlalchemy
+python-dotenv
+passlib[bcrypt]
+python-jose
+email-validator
+sqlalchemy
+fastapi[standard]
+psycopg2
+httpx
