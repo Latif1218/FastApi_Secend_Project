@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
+from typing import Optional
 
 
 
@@ -24,3 +25,22 @@ class UserRespons(BaseModel):
     
     class Config:
         orrm_model = True 
+        
+        
+        
+class Token(BaseModel):
+    access_token : str
+    token_type : str
+
+    class Config:
+        orm_mode = True
+        
+        
+class UserLogin(BaseModel):
+    email : EmailStr
+    password : str 
+    
+    
+    
+class TokenData(BaseModel):
+    id : Optional[int] = None
