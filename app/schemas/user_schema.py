@@ -23,17 +23,19 @@ class UserRespons(BaseModel):
     email: EmailStr
     created_at: datetime
     
-    class Config:
-        orrm_model = True 
+    model_config = {
+        "from_attributes": True
+    } 
         
         
         
-class Token(BaseModel):
+class UserToken(BaseModel):
     access_token : str
     token_type : str
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
         
         
 class UserLogin(BaseModel):

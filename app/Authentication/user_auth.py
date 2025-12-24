@@ -17,13 +17,13 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 5  
 
 
-def get_user(db: Session, email: str):
-    user = db.query(user_models.User).filter(user_models.User.email == email).first()
+def get_user(db: Session, username: str):
+    user = db.query(user_models.User).filter(user_models.User.email == username).first()
     return user
 
 
-def authenticate_user(db: Session, email: str, password: str):
-    user = get_user(db, email)
+def authenticate_user(db: Session, username: str, password: str):
+    user = get_user(db, username)
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -31,7 +31,7 @@ def authenticate_user(db: Session, email: str, password: str):
     return user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.coppy()
+    to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -41,7 +41,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encode_jwt
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_schema)]):
+def get_current_user(
+    token: str = Depends(oauth2_schema),
+    db: Session = Depends(get_db)                 
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -49,15 +52,16 @@ def get_current_user(token: Annotated[str, Depends(oauth2_schema)]):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get("user_id")
+        user_id: str = payload.get("user_id")
         
-        if id is None:
+        if user_id is None:
             raise credentials_exception
-        token_data = user_schema.TokenData(id=id)
+        token_data = user_schema.TokenData(id=user_id)
         
     except IndentationError:
         raise credentials_exception
-    user = get_user(db = Depends(get_db), email= token_data.id)
+    
+    user = db.query(user_models.User).filter(user_models.User.id == token_data.id).first()
     if user is None:
         raise credentials_exception
     return user
