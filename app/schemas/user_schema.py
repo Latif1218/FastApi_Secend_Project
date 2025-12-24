@@ -18,6 +18,17 @@ class UserCreate(BaseModel):
             raise ValueError('Password must be at least 8 characters long')
         return v 
     
+    
+# ==============================================================================  
+    # praferable but not necessary
+    # @field_validator("new_password")
+    # def strong_password(cls, v):
+    #     if not any(c.isdigit() for c in v):
+    #         raise ValueError("Password must contain a number")
+    #     return v
+# ==============================================================================
+
+
 class UserRespons(BaseModel):
     id: int
     email: EmailStr
@@ -46,3 +57,49 @@ class UserLogin(BaseModel):
     
 class TokenData(BaseModel):
     id : Optional[int] = None
+    
+    
+
+
+
+class PasswordUpdate(BaseModel):
+    new_password: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
+    model_config = {
+        "extra": "forbid"
+    }
+    
+    
+    
+    
+    
+class PasswoedUpdateWithoutToken(BaseModel):
+    email : EmailStr
+    otp : str
+    new_password: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
+    model_config = {
+        "extra": "forbid"
+    }
+    
+    
+    
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    model_config = {
+        "extra": "forbid"
+    }
+    
+    
+    
+class OTPVerify(BaseModel):
+    email : EmailStr
+    otp: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
+    model_config = {
+        "extra": "forbid"
+    }
+    
+    @field_validator('code')
+    def validate_code(cls, v):
+        if not v.isdigit():
+            raise ValueError('Code must contain only digits')
+        return v
+    

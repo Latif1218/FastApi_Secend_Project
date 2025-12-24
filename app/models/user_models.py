@@ -1,6 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, text, DateTime
 from ..database import Base
+from cuid2 import Cuid
+import datetime
 
+
+cuid = Cuid()
 
 
 class User(Base):
@@ -16,3 +20,14 @@ class User(Base):
     
     
 
+
+class PasswordResetCode(Base):
+    __tablename__ = "password_reset_codes"
+    
+    id = Column(String, primary_key=True, default=lambda: str(cuid.generate()))
+    user_id = Column(String, nullable=False)
+    otp = Column(String(4), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    

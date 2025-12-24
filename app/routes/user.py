@@ -44,3 +44,8 @@ def user(user: Session = Depends(user_auth.get_current_user)):
             detail="Authentication Faild"
         )
     return {"User": user}
+
+
+
+
+
