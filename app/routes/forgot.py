@@ -5,11 +5,13 @@ from ..database import get_db
 from ..schemas import user_schema
 from ..models import user_models
 from ..utils.otp_sender import generate_otp
+from ..utils.email_sender import send_otp_email
 from datetime import datetime, timedelta, timezone
 
 
+
 router = APIRouter(
-    prefix="forgot",
+    prefix="/forgot",
     tags=["Forgot Password"]
 )
 
@@ -31,13 +33,32 @@ def forgot_password(payload: user_schema.ForgotPasswordRequest, db: Session = De
     otp_record = user_models.PasswordResetCode(
         user_id = user.id,
         code = set_otp,
-        used = False
+        used = False,
         Expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
     )
     db.add(otp_record)
     db.commit()
     
+    sent = send_otp_email(to_email = user.email, otp = set_otp)
+    
+    if not sent:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send otp email"
+        )
+    return {
+        "status": "success",
+        "message": f"password reset otp sent to {user.email}"
+    }
+    
+    
+    
+
+@router.post("/verify_otp",status_code=status.HTTP_200_OK)
+def verify_otp(payload: user_schema.OTPVerify, db: Session = Depends(get_db)):
     
     
     
     
+    
+

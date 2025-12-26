@@ -1,7 +1,7 @@
 # step 1.1
 
 from fastapi import FastAPI
-from .routes import register_user, user, admin
+from .routes import register_user, user, admin, forgot
 from . database import Base, engine
 
 
@@ -12,3 +12,4 @@ app = FastAPI()
 app.include_router(user.router)
 app.include_router(register_user.router)
 app.include_router(admin.router)
+app.include_router(forgot.router)

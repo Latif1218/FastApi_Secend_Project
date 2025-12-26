@@ -97,9 +97,9 @@ class OTPVerify(BaseModel):
         "extra": "forbid"
     }
     
-    @field_validator('code')
-    def validate_code(cls, v):
+    @field_validator('otp')
+    def validate_otp(cls, v):
         if not v.isdigit():
-            raise ValueError('Code must contain only digits')
+            raise ValueError('OTP must contain only digits')
         return v
     
