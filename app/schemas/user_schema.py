@@ -72,16 +72,6 @@ class PasswordUpdate(BaseModel):
     
     
     
-class PasswoedUpdateWithoutToken(BaseModel):
-    email : EmailStr
-    otp : str
-    new_password: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
-    model_config = {
-        "extra": "forbid"
-    }
-    
-    
-    
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
     model_config = {
@@ -92,7 +82,7 @@ class ForgotPasswordRequest(BaseModel):
     
 class OTPVerify(BaseModel):
     email : EmailStr
-    otp: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
+    otp: str 
     model_config = {
         "extra": "forbid"
     }
@@ -103,3 +93,12 @@ class OTPVerify(BaseModel):
             raise ValueError('OTP must contain only digits')
         return v
     
+    
+    
+class PasswoedUpdateWithoutToken(BaseModel):
+    email : EmailStr
+    otp : str
+    new_password: str = Field(..., min_length=8, max_length=128, description="password must be between 8 to 128 characters")
+    model_config = {
+        "extra": "forbid"
+    }

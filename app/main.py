@@ -1,5 +1,3 @@
-# step 1.1
-
 from fastapi import FastAPI
 from .routes import register_user, user, admin, forgot
 from . database import Base, engine

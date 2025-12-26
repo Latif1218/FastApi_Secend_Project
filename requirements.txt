@@ -13,3 +13,4 @@ fastapi[standard]
 psycopg2
 httpx
 cuid2
+redis
