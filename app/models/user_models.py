@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String,ForeignKey, Boolean, TIMESTAMP, text, DateTime
 from ..database import Base
+from sqlalchemy.orm import relationship
 from cuid2 import Cuid
 import datetime
 
@@ -18,6 +19,8 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     role = Column(String, nullable=False)
     
+    
+    moods = relationship("Mood", back_populates="user")
     
 
 
