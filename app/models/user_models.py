@@ -22,6 +22,7 @@ class User(Base):
     
     moods = relationship("Mood", back_populates="user")
     habits = relationship("Habit", back_populates="user")
+    routines = relationship("Routine", back_populates="user")
     
 
 

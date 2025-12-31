@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routes import register_user, user, admin, forgot, moods, habits
+from .routes import register_user, user, admin, forgot, moods, habits, routine
 from . database import Base, engine
 
 
@@ -13,3 +13,4 @@ app.include_router(admin.router)
 app.include_router(forgot.router)
 app.include_router(moods.router)
 app.include_router(habits.router)
+app.include_router(routine.router)

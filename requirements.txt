@@ -14,3 +14,4 @@ psycopg2
 httpx
 cuid2
 redis
+groq
