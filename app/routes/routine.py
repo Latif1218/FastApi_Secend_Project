@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import date, datetime as dt
+from datetime import datetime
 from ..models import user_models, user_routine_models, user_mood_models
 from ..schemas import user_routine_schema, user_mood_schema
 from ..database import get_db
@@ -96,4 +97,116 @@ def get_today_routines(
     ).all()
     
     return routines
+
+
+
+
+# marked router completed
+
+@router.patch("/{routine_id}/complete", status_code=status.HTTP_200_OK, response_model=user_routine_schema.RoutineOut)
+def complete_routine(
+    routine_id: int,
+    db: Session = Depends(get_db),
+    user: user_models.User = Depends(user_auth.get_current_user)
+):
+    routine = db.query(user_routine_models.Routine).filter(
+        user_routine_models.Routine.id == routine_id
+    ).filter(
+        user_routine_models.Routine.user_id == user.id
+    ).first()
     
+    if not routine:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Routine not found"
+        )
+        
+    if routine.completed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Routine already compleated"
+        )
+        
+    routine.completed = True
+    routine.completed_at = datetime.utcnow()
+    db.commit()
+    db.refresh(routine)
+    return routine
+
+
+
+
+# Do it again Routin duplicate
+
+@router.post("/{routine_id}/redo", status_code=status.HTTP_201_CREATED, response_model=user_routine_schema.RoutineOut)
+def redo_routine(
+    routine_id: int,
+    db: Session = Depends(get_db),
+    user: user_models.User = Depends(user_auth.get_current_user)
+):
+    original = db.query(user_routine_models.Routine).filter(
+        user_routine_models.Routine.id == routine_id
+    ).filter(
+        user_routine_models.Routine.user_id == user.id
+    ).first()
+    
+    if not original:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Routine not found"
+        )
+        
+    new_routine = user_routine_models.Routine(
+        name = original.name + " (Again)",
+        duration_minutes = original.duration_minutes,
+        is_ai_generated=original.is_ai_generated,
+        scheduled_time=original.scheduled_time,
+        user_id=user.id,
+        completed=False
+    )
+    
+    db.add(new_routine)
+    db.flush()
+    
+    for act in original.activities:
+        new_act = user_routine_models.RoutineActivity(
+            routine_id=new_routine.id,
+            activity_type=act.activity_type,
+            title=act.title,
+            duration_minutes=act.duration_minutes
+        )
+        
+        db.add(new_act)
+        
+    db.commit()
+    db.refresh(new_routine)
+    return new_routine
+
+
+
+
+# routin Deleted
+
+@router.delete("/{router_id}")
+def delete_routine(
+    routine_id: int,
+    db: Session = Depends(get_db),
+    user: user_models.User = Depends(user_auth.get_current_user)
+):
+    routine = db.query(user_routine_models.Routine).filter(
+        user_routine_models.Routine.id == routine_id
+    ).filter(
+        user_routine_models.Routine.user_id == user.id
+    ).first()
+    
+    
+    if not routine:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Routine not found"
+        )
+        
+    db.delete(routine)
+    db.commit()
+    return {"massage": "Routine deleted successfully"}
+
