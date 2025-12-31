@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
+from datetime import date, datetime as dt
 from ..models import user_models, user_routine_models, user_mood_models
 from ..schemas import user_routine_schema, user_mood_schema
 from ..database import get_db
@@ -73,3 +73,27 @@ def get_my_routines(
     ).order_by(user_routine_models.Routine.created_at.desc()).all()
     
     return routines
+
+
+
+# get todays routine
+
+@router.get("/today", status_code=status.HTTP_200_OK, response_model=List[user_routine_schema.RoutineOut])
+def get_today_routines(
+    db: Session = Depends(get_db),
+    user: user_models.User = Depends(user_auth.get_current_user)
+):
+    
+    today = date.today()
+    routines = db.query(user_routine_models.Routine).filter(
+        user_routine_models.Routine.user_id == user.id
+    ).filter(
+        user_routine_models.Routine.created_at >= dt.combine(today, dt.min.time())
+    ).filter(
+        user_routine_models.Routine.created_at < dt.combine(today, dt.max.time())
+    ).order_by(
+        user_routine_models.Routine.is_ai_generated.desc()
+    ).all()
+    
+    return routines
+    
