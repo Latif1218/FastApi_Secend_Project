@@ -70,7 +70,7 @@ Make it calming, positive, and realistic. Keep language warm and supportive.
         
         if "activities" not in data or len(data["activities"]) < 2:
             raise ValueError("Invalid AI response")
-            
+             
         return data
 
     
