@@ -18,11 +18,12 @@ class User(Base):
     is_verifide = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     role = Column(String, nullable=False)
-    
+    is_premium = Column(Boolean, default=False)
     
     moods = relationship("Mood", back_populates="user")
     habits = relationship("Habit", back_populates="user")
     routines = relationship("Routine", back_populates="user")
+    subscription = relationship("Subscription", back_populates="user", uselist=False)
     
 
 
